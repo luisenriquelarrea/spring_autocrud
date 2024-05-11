@@ -17,7 +17,6 @@ public class Templates {
     private String controllerTemplate;
     
     public Templates(){
-        setPackageName();
         setModeloTemplate();
         setRepositoryTemplate();
         setServiceTemplate();
@@ -25,8 +24,8 @@ public class Templates {
         setControllerTemplate();
     }
     
-    private void setPackageName(){
-        packageName = "artplusplus";
+    public void setPackageName(String packageName){
+        this.packageName = packageName;
     }
     
     public String getPackageName(){

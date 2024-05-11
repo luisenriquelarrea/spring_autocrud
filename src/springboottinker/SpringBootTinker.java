@@ -20,11 +20,28 @@ public class SpringBootTinker {
     public static void main(String[] args) {
         String className = "Plaza";
         String tableName = "plaza";
+        String packageName = "artplusplus";
+        /*try {
+            className = args[0];
+            tableName = args[1];
+            packageName = args[2];
+        } catch(ArrayIndexOutOfBoundsException ex) {
+            System.out.println("args required.");
+        }*/
         Templates templates = new Templates();
-        String packageName = templates.getPackageName();
         String modeloTemplate = templates.getModeloTemplate();
+        modeloTemplate = buildTemplate(modeloTemplate, className, 
+                tableName, packageName);
         File myFile = createFile(className);
         writeFile(myFile, modeloTemplate);
+    }
+    
+    public static String buildTemplate(String template, String className, 
+            String tableName, String packageName){
+        template = template.replaceAll("packageName", packageName);
+        template = template.replaceAll("className", className);
+        template = template.replaceAll("tableName", tableName);
+        return template;
     }
     
     public static File createFile(String className){
