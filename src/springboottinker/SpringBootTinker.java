@@ -8,6 +8,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
+
 /**
  *
  * @author desarrollo
@@ -19,6 +23,8 @@ public class SpringBootTinker {
      */
     public static void main(String[] args) {
         String className = "Plaza";
+        String objName = className.substring(0, 1).toUpperCase() 
+                + className.substring(1);
         String tableName = "plaza";
         String packageName = "artplusplus";
         /*try {
@@ -30,17 +36,23 @@ public class SpringBootTinker {
         }*/
         Templates templates = new Templates();
         String modeloTemplate = templates.getModeloTemplate();
-        modeloTemplate = buildTemplate(modeloTemplate, className, 
-                tableName, packageName);
+        Map<String, String> keys = new HashMap<>();
+        keys.put("packageName", packageName);
+        keys.put("className", className);
+        keys.put("tableName", tableName);
+        modeloTemplate = buildTemplate(modeloTemplate, keys);
         File myFile = createFile(className);
         writeFile(myFile, modeloTemplate);
     }
     
-    public static String buildTemplate(String template, String className, 
-            String tableName, String packageName){
-        template = template.replaceAll("packageName", packageName);
-        template = template.replaceAll("className", className);
-        template = template.replaceAll("tableName", tableName);
+    public static String buildTemplate(String template, Map keys){
+        Iterator it = keys.entrySet().iterator();
+        while (it.hasNext()) {
+            HashMap.Entry pair = (HashMap.Entry)it.next();
+            String key = pair.getKey().toString().trim();
+            String value = pair.getValue().toString().trim();
+            template = template.replaceAll(key, value);
+        }
         return template;
     }
     
@@ -55,7 +67,7 @@ public class SpringBootTinker {
             }
         } catch (IOException e) {
             System.out.println("An error occurred.");
-            e.printStackTrace();
+            System.exit(0);
         }
         return myObj;
     }
@@ -68,7 +80,7 @@ public class SpringBootTinker {
             System.out.println("Successfully wrote to the file.");
         } catch (IOException e) {
             System.out.println("An error occurred.");
-            e.printStackTrace();
+            System.exit(0);
         }
     }
     
