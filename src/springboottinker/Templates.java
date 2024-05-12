@@ -24,14 +24,6 @@ public class Templates {
         setControllerTemplate();
     }
     
-    public void setPackageName(String packageName){
-        this.packageName = packageName;
-    }
-    
-    public String getPackageName(){
-        return packageName;
-    }
-    
     private void setModeloTemplate(){
         modeloTemplate = """
                          package com.packageName.artifactName.model;
@@ -41,7 +33,6 @@ public class Templates {
                          import jakarta.persistence.GeneratedValue;
                          import jakarta.persistence.GenerationType;
                          import jakarta.persistence.Id;
-                         import jakarta.persistence.ManyToOne;
                          import lombok.Data;
                          import lombok.Getter;
                          import lombok.RequiredArgsConstructor;
