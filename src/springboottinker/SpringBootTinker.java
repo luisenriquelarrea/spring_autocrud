@@ -57,26 +57,25 @@ public class SpringBootTinker {
     }
     
     public static File createFile(String className){
-        File myObj = null;
+        File file = null;
         try {
-            myObj = new File("/home/desarrollo/Desktop/"+className+".java");
-            if (myObj.createNewFile()) {
-              System.out.println("File created: " + myObj.getName());
-            } else {
+            file = new File("/home/desarrollo/Desktop/"+className+".java");
+            if (file.createNewFile())
+              System.out.println("File created: " + file.getName());
+            else
               System.out.println("File already exists.");
-            }
         } catch (IOException e) {
             System.out.println("An error occurred.");
             System.exit(0);
         }
-        return myObj;
+        return file;
     }
     
-    public static void writeFile(File myFile, String content){
+    public static void writeFile(File file, String content){
         try {
-            FileWriter myWriter = new FileWriter(myFile);
-            myWriter.write(content);
-            myWriter.close();
+            FileWriter writer = new FileWriter(file);
+            writer.write(content);
+            writer.close();
             System.out.println("Successfully wrote to the file.");
         } catch (IOException e) {
             System.out.println("An error occurred.");
