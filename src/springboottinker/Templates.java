@@ -49,6 +49,9 @@ public class Templates {
                              @GeneratedValue(strategy=GenerationType.IDENTITY)
                              private Long id;
 
+                             private String descripcion;
+                         
+                             private int status;
                          }""";
     }
     
