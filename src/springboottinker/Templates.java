@@ -9,7 +9,6 @@ package springboottinker;
  * @author desarrollo
  */
 public class Templates {
-    private String packageName;
     private String modeloTemplate;
     private String repositoryTemplate;
     private String serviceTemplate;
