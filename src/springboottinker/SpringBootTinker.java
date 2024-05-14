@@ -6,11 +6,14 @@ package springboottinker;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Properties;
 
 /**
  *
@@ -22,6 +25,16 @@ public class SpringBootTinker {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        SpringBootTinker obj = new SpringBootTinker();        
+        Properties props = null;
+        try {
+            props = obj.load_properties_file();
+        } catch (IOException e) {
+            System.out.println("Error loading properties file.");
+            System.exit(0);
+        }
+        System.out.println(props.getProperty("package"));
+        System.exit(0);
         String className = "";
         String tableName = "";
         String packageName = "";
@@ -124,6 +137,27 @@ public class SpringBootTinker {
         if(fileType.equalsIgnoreCase("controller"))
             return basedir+"/controller/";
         return "";
+    }
+    
+    public Properties load_properties_file() throws IOException{
+        Properties props = new Properties();
+        InputStream input_stream = null;
+        try{
+            input_stream = this.getClass()
+                    .getResourceAsStream(
+                            new File("env.properties").getAbsolutePath());
+            if (input_stream != null)
+                props.load(input_stream);
+            else
+                throw new FileNotFoundException(new File("").getAbsolutePath()+"/env.properties");
+        }catch(IOException ex){
+            System.out.println(ex);
+            System.exit(0);
+        }finally{
+            if(input_stream != null)
+                input_stream.close();
+        }
+        return props;
     }
     
     public static void writeFile(File file, String content){
