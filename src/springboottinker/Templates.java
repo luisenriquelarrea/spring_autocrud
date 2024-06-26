@@ -10,6 +10,7 @@ package springboottinker;
  */
 public class Templates {
     private String modeloTemplate;
+    private String specificationTemplate;
     private String repositoryTemplate;
     private String serviceTemplate;
     private String serviceImplTemplate;
@@ -17,6 +18,7 @@ public class Templates {
     
     public Templates(){
         setModeloTemplate();
+        setSpecificationTemplate();
         setRepositoryTemplate();
         setServiceTemplate();
         setServiceImplTemplate();
@@ -58,15 +60,53 @@ public class Templates {
         return modeloTemplate;
     }
     
+    private void setSpecificationTemplate(){
+        specificationTemplate = """
+                                package com.packageName.artifactName.repository.specifications;
+                                
+                                import java.util.List;
+                                import java.util.ArrayList;
+                                
+                                import org.springframework.data.jpa.domain.Specification;
+                                
+                                import com.packageName.artifactName.model.className;
+                                
+                                import jakarta.persistence.criteria.CriteriaBuilder;
+                                import jakarta.persistence.criteria.CriteriaQuery;
+                                import jakarta.persistence.criteria.Predicate;
+                                import jakarta.persistence.criteria.Root;
+                                
+                                public class classNameSpecifications implements Specification<className>{
+                                    private className objName = null;
+                                
+                                    public classNameSpecifications(className objName){
+                                        this.objName = objName;
+                                    }
+                                
+                                    @Override
+                                    public Predicate toPredicate(Root<className> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                                        List<Predicate> predicates = new ArrayList<Predicate>();
+                                        
+                                        return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+                                    }
+                                }
+                                """;
+    }
+    
+    public String getSpecificationTemplate(){
+        return specificationTemplate;
+    }
+    
     private void setRepositoryTemplate(){
         repositoryTemplate = """
                              package com.packageName.artifactName.repository;
                              
-                             import org.springframework.data.repository.CrudRepository;
+                             import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+                             import org.springframework.data.jpa.repository.JpaRepository;
                              
                              import com.packageName.artifactName.model.className;
                              
-                             public interface classNameRepository extends CrudRepository<className, Long> {
+                             public interface classNameRepository extends JpaRepository<className, Long>, JpaSpecificationExecutor<className> {
                                  
                              }
                              """;
@@ -82,6 +122,8 @@ public class Templates {
                           
                           import java.util.List;
                           
+                          import org.springframework.data.jpa.domain.Specification;
+                          
                           import com.packageName.artifactName.model.className;
                           
                           public interface classNameService {
@@ -96,6 +138,12 @@ public class Templates {
                           
                               //Exists by id operation
                               boolean existsById(Long id);
+                          
+                              //Get entity by id
+                              className getById(Long id);
+                              
+                              //Read operation filtered by specifications
+                              List<className> filteredList(Specification<className> specs);
                           }
                           """;
     }
@@ -109,6 +157,7 @@ public class Templates {
                               package com.packageName.artifactName.service;
                               
                               import org.springframework.beans.factory.annotation.Autowired;
+                              import org.springframework.data.jpa.domain.Specification;
                               import org.springframework.stereotype.Service;
                               
                               import com.packageName.artifactName.model.className;
@@ -140,6 +189,16 @@ public class Templates {
                                   public boolean existsById(Long id) {
                                       return objNameRepository.existsById(id);
                                   }
+                              
+                                  @Override
+                                  public className getById(Long id){
+                                      return objNameRepository.findById(id).get();
+                                  }
+                                  
+                                  @Override
+                                  public List<className> filteredList(Specification<className> specs){
+                                      return (List<className>) objNameRepository.findAll(specs);
+                                  }
                               }
                               """;
     }
@@ -154,6 +213,7 @@ public class Templates {
                              
                              import org.springframework.beans.factory.annotation.Autowired;
                              import org.springframework.http.ResponseEntity;
+                             import org.springframework.data.jpa.domain.Specification;
                              import org.springframework.web.bind.annotation.CrossOrigin;
                              import org.springframework.web.bind.annotation.DeleteMapping;
                              import org.springframework.web.bind.annotation.RestController;
@@ -166,6 +226,7 @@ public class Templates {
                              import org.springframework.web.bind.annotation.ResponseBody;
                              
                              import com.packageName.artifactName.model.className;
+                             import com.packageName.artifactName.repository.specifications.classNameSpecifications;
                              import com.packageName.artifactName.service.classNameService;
                              
                              import java.util.List;
@@ -206,6 +267,23 @@ public class Templates {
                                          return ResponseEntity.ok("Deleted");
                                      }
                                      return ResponseEntity.ok("ID not found");
+                                 }
+                             
+                                 @GetMapping(path="/{id}")
+                                 public ResponseEntity<className> getById(@PathVariable Long id){
+                                     if(objNameService.existsById(id)){
+                                         className objName = objNameService.getById(id);
+                                         return ResponseEntity.ok(objName);
+                                     }
+                                     return ResponseEntity.notFound().build();
+                                 }
+                                 
+                                 @PostMapping(path="/filteredList") // Map ONLY POST Requests
+                                 public @ResponseBody List<className> filteredList(@RequestBody className objName) {
+                                     // @ResponseBody means the returned Entity is the response, not a view name
+                                     // @RequestParam means it is a parameter from the GET or POST request
+                                     Specification<className> specs = new classNameSpecifications(objName);
+                                     return objNameService.filteredList(specs);
                                  }
                              }
                              """;
