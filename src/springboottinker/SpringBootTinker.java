@@ -25,16 +25,7 @@ public class SpringBootTinker {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        SpringBootTinker obj = new SpringBootTinker();        
-        Properties props = null;
-        try {
-            props = obj.load_properties_file();
-        } catch (IOException e) {
-            System.out.println("Error loading properties file.");
-            System.exit(0);
-        }
-        System.out.println(props.getProperty("package"));
-        System.exit(0);
+        SpringBootTinker obj = new SpringBootTinker();
         String className = "";
         String tableName = "";
         String packageName = "";
@@ -67,7 +58,7 @@ public class SpringBootTinker {
         createJavaFile(template, "model", keys);
         
         template = templates.getSpecificationTemplate();
-        createJavaFile(template, "specification", keys);
+        createJavaFile(template, "Specifications", keys);
         
         template = templates.getRepositoryTemplate();
         createJavaFile(template, "Repository", keys);
@@ -131,7 +122,7 @@ public class SpringBootTinker {
     public static String getDirectory(String fileType, String basedir){
         if(fileType.equalsIgnoreCase("model"))
             return basedir+"/model/";
-        if(fileType.equalsIgnoreCase("specification"))
+        if(fileType.equalsIgnoreCase("specifications"))
             return basedir+"/repository/specifications/";
         if(fileType.equalsIgnoreCase("repository"))
             return basedir+"/repository/";
