@@ -10,6 +10,7 @@ package springboottinker;
  */
 public class Templates {
     private String modeloTemplate;
+    private String dtoTemplate;
     private String specificationTemplate;
     private String repositoryTemplate;
     private String serviceTemplate;
@@ -18,6 +19,7 @@ public class Templates {
     
     public Templates(){
         setModeloTemplate();
+        setDtoTemplate();
         setSpecificationTemplate();
         setRepositoryTemplate();
         setServiceTemplate();
@@ -68,6 +70,43 @@ public class Templates {
         return modeloTemplate;
     }
     
+    private void setDtoTemplate(){
+        dtoTemplate = """
+                         package com.packageName.artifactName.dto;
+                         
+                         import jakarta.persistence.Table;
+                         
+                         import lombok.Getter;
+                         import lombok.Setter;
+                         
+                         @Table(name = "tableName")
+                         @Getter
+                         @Setter
+                         public class classNameDto {
+                             private Long id;
+
+                             private String descripcion;
+                         
+                             private int status;
+                         
+                             public String createdAt;
+                             
+                             public String updatedAt;
+                             
+                             public Integer userCreatedId;
+                             
+                             public Integer userUpdatedId;
+                         
+                             private int offset;
+                                           
+                             private int limit;
+                         }""";
+    }
+    
+    public String getDtoTemplate(){
+        return dtoTemplate;
+    }
+    
     private void setSpecificationTemplate(){
         specificationTemplate = """
                                 package com.packageName.artifactName.repository.specifications;
@@ -78,6 +117,7 @@ public class Templates {
                                 import org.springframework.data.jpa.domain.Specification;
                                 
                                 import com.packageName.artifactName.model.className;
+                                import com.packageName.artifactName.dto.classNameDto;
                                 
                                 import jakarta.persistence.criteria.CriteriaBuilder;
                                 import jakarta.persistence.criteria.CriteriaQuery;
@@ -85,10 +125,10 @@ public class Templates {
                                 import jakarta.persistence.criteria.Root;
                                 
                                 public class classNameSpecifications implements Specification<className>{
-                                    private className objName = null;
+                                    private classNameDto objNameDto = null;
                                 
-                                    public classNameSpecifications(className objName){
-                                        this.objName = objName;
+                                    public classNameSpecifications(classNameDto objNameDto){
+                                        this.objNameDto = objNameDto;
                                     }
                                 
                                     @Override
@@ -130,8 +170,10 @@ public class Templates {
                           
                           import java.util.List;
                           
+                          import org.springframework.data.domain.PageRequest;
                           import org.springframework.data.jpa.domain.Specification;
                           
+                          import com.packageName.artifactName.dto.classNameDto;
                           import com.packageName.artifactName.model.className;
                           
                           public interface classNameService {
@@ -151,7 +193,13 @@ public class Templates {
                               className getById(Long id);
                               
                               //Read operation filtered by specifications
-                              List<className> filteredList(Specification<className> specs);
+                              List<classNameDto> filteredList(Specification<className> specs, PageRequest pageRequest);
+                              
+                              //Count entity records
+                              long count();
+                              
+                              //Count entity records with filter
+                              long countFilteredList(Specification<className> specs);
                           }
                           """;
     }
@@ -165,11 +213,15 @@ public class Templates {
                               package com.packageName.artifactName.service;
                               
                               import org.springframework.beans.factory.annotation.Autowired;
+                              import org.springframework.data.domain.Page;
+                              import org.springframework.data.domain.PageRequest;
                               import org.springframework.data.jpa.domain.Specification;
                               import org.springframework.stereotype.Service;
                               
+                              import com.packageName.artifactName.dto.classNameDto;
                               import com.packageName.artifactName.model.className;
                               import com.packageName.artifactName.repository.classNameRepository;
+                              import com.packageName.artifactName.utils.ObjectMapperUtils;
                               
                               import java.util.List;
                               
@@ -204,8 +256,22 @@ public class Templates {
                                   }
                                   
                                   @Override
-                                  public List<className> filteredList(Specification<className> specs){
-                                      return (List<className>) objNameRepository.findAll(specs);
+                                  public List<classNameDto> filteredList(Specification<className> specs, PageRequest pageRequest){
+                                      Page<className> objNamePage = objNameRepository.findAll(specs,
+                                          pageRequest);
+                                      List<className> objName = objNamePage.getContent();
+                                      return (List<classNameDto>) 
+                                          ObjectMapperUtils.mapAll(objName, classNameDto.class);
+                                  }
+                                  
+                                  @Override
+                                  public long count(){
+                                      return objNameRepository.count();
+                                  }
+                                  
+                                  @Override
+                                  public long countFilteredList(Specification<className> specs){
+                                      return objNameRepository.count(specs);
                                   }
                               }
                               """;
@@ -221,6 +287,7 @@ public class Templates {
                              
                              import org.springframework.beans.factory.annotation.Autowired;
                              import org.springframework.http.ResponseEntity;
+                             import org.springframework.data.domain.PageRequest;
                              import org.springframework.data.jpa.domain.Specification;
                              import org.springframework.web.bind.annotation.CrossOrigin;
                              import org.springframework.web.bind.annotation.DeleteMapping;
@@ -233,13 +300,14 @@ public class Templates {
                              import org.springframework.web.bind.annotation.RequestMapping;
                              import org.springframework.web.bind.annotation.ResponseBody;
                              
+                             import com.packageName.artifactName.dto.classNameDto;
                              import com.packageName.artifactName.model.className;
                              import com.packageName.artifactName.repository.specifications.classNameSpecifications;
                              import com.packageName.artifactName.service.classNameService;
                              
                              import java.util.List;
                              
-                             @CrossOrigin(origins = "http://localhost:3000")
+                             @CrossOrigin(origins = "*")
                              @RestController // This means that this class is a Controller
                              @RequestMapping(path="/api/tableName") // This means URL's start with / (after Application path)
                              public class classNameController {
@@ -287,11 +355,24 @@ public class Templates {
                                  }
                                  
                                  @PostMapping(path="/filteredList") // Map ONLY POST Requests
-                                 public @ResponseBody List<className> filteredList(@RequestBody className objName) {
+                                 public @ResponseBody List<classNameDto> filteredList(@RequestBody classNameDto objNameDto) {
                                      // @ResponseBody means the returned Entity is the response, not a view name
-                                     // @RequestParam means it is a parameter from the GET or POST request
-                                     Specification<className> specs = new classNameSpecifications(objName);
-                                     return objNameService.filteredList(specs);
+                                     Specification<className> specs = new classNameSpecifications(objNameDto);
+                                     int offset = objNameDto.getOffset();
+                                     int limit = objNameDto.getLimit();
+                                     int page = offset / limit;
+                                     return objNameService.filteredList(specs, PageRequest.of(page, limit));
+                                 }
+                                 
+                                 @GetMapping(path="/count")
+                                 public ResponseEntity<Long> count() {
+                                     return ResponseEntity.ok(objNameService.count());
+                                 }
+                                 
+                                 @PostMapping(path="/countFilteredList")
+                                 public ResponseEntity<Long> countFilteredList(@RequestBody classNameDto objNameDto) {
+                                     Specification<className> specs = new classNameSpecifications(objNameDto);
+                                     return ResponseEntity.ok(objNameService.countFilteredList(specs));
                                  }
                              }
                              """;

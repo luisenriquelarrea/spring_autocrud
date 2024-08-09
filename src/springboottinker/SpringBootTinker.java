@@ -57,6 +57,9 @@ public class SpringBootTinker {
         String template = templates.getModeloTemplate();
         createJavaFile(template, "model", keys);
         
+        template = templates.getDtoTemplate();
+        createJavaFile(template, "Dto", keys);
+        
         template = templates.getSpecificationTemplate();
         createJavaFile(template, "Specifications", keys);
         
@@ -122,6 +125,8 @@ public class SpringBootTinker {
     public static String getDirectory(String fileType, String basedir){
         if(fileType.equalsIgnoreCase("model"))
             return basedir+"/model/";
+        if(fileType.equalsIgnoreCase("dto"))
+            return basedir+"/dto/";
         if(fileType.equalsIgnoreCase("specifications"))
             return basedir+"/repository/specifications/";
         if(fileType.equalsIgnoreCase("repository"))
