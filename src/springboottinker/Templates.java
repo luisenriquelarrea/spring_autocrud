@@ -179,6 +179,9 @@ public class Templates {
                           public interface classNameService {
                               //Create operation
                               className save(className objName);
+                          
+                              // Save a list of entities in batch
+                              List<className> saveAll(List<className> objName);
                               
                               //Read operation
                               List<className> list();
@@ -233,6 +236,11 @@ public class Templates {
                                   @Override
                                   public className save(className objName) {
                                       return objNameRepository.save(objName);
+                                  }
+                              
+                                  @Override
+                                  public List<className> saveAll(List<className> objName){
+                                      return objNameRepository.saveAll(objName);
                                   }
                               
                                   @Override
