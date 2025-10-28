@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
  */
-package springboottinker;
+package springautocrud;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -19,13 +19,13 @@ import java.util.Properties;
  *
  * @author desarrollo
  */
-public class SpringBootTinker {
+public class SpringAutoCrud {
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        SpringBootTinker obj = new SpringBootTinker();
+        SpringAutoCrud obj = new SpringAutoCrud();
         String className = "";
         String tableName = "";
         String packageName = "";

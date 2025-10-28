@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package springboottinker;
+package springautocrud;
 
 /**
  *
@@ -328,6 +328,25 @@ public class Templates {
                                      // @RequestParam means it is a parameter from the GET or POST request
                                      className obj = objNameService.save(objName);
                                      return ResponseEntity.ok(obj);
+                                 }
+                             
+                                 @PostMapping(path="/addAll")
+                                 public ResponseEntity<Object> addAll(@RequestBody List<className> objNameList) {
+                                     if (objNameList == null || objNameList.isEmpty())
+                                         return ResponseEntity.badRequest().body(Map.of("message", "Sin información a guardar."));
+                                     try {
+                                         List<className> saved = objNameService.saveAll(objNameList);
+                                         return ResponseEntity.ok(saved);
+                                     } catch (BusinessException ex) {
+                                         return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
+                                     } catch (OptimisticLockException ex) {
+                                         return ResponseEntity.status(HttpStatus.CONFLICT)
+                                             .body(Map.of("message", "El registro fue modificado por otro usuario. Recarga y vuelve a intentar."));
+                                     } catch (Exception ex) {
+                                         ex.printStackTrace();
+                                         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                             .body(Map.of("message", "Error al guardar los registros: " + ex.getMessage()));
+                                     }
                                  }
                              
                                  @PutMapping(path="/{id}")
