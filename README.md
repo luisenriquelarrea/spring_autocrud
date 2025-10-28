@@ -1,6 +1,6 @@
-# spring autocrud
+# Spring AutoCRUD
 
-
+Java Ant project that generates models, controllers, and repositories automatically like Laravel’s php artisan make.
 
 ## Getting started
 
