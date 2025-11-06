@@ -31,11 +31,20 @@ public class Templates {
         modeloTemplate = """
                          package com.packageName.artifactName.model;
                          
+                         import java.time.LocalDateTime;
+                         
+                         import org.springframework.data.annotation.CreatedDate;
+                         import org.springframework.data.annotation.LastModifiedDate;
+                         import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+                         
+                         import jakarta.persistence.Column;
                          import jakarta.persistence.Entity;
+                         import jakarta.persistence.EntityListeners;
                          import jakarta.persistence.Table;
                          import jakarta.persistence.GeneratedValue;
                          import jakarta.persistence.GenerationType;
                          import jakarta.persistence.Id;
+                         
                          import lombok.Data;
                          import lombok.Getter;
                          import lombok.RequiredArgsConstructor;
@@ -43,6 +52,7 @@ public class Templates {
                          
                          @Entity
                          @Table(name = "tableName")
+                         @EntityListeners(AuditingEntityListener.class)
                          @Data
                          @RequiredArgsConstructor
                          @Getter
@@ -56,13 +66,16 @@ public class Templates {
                          
                              private int status;
                          
-                             public String createdAt;
+                             @CreatedDate
+                             @Column(updatable = false)
+                             private LocalDateTime createdAt;
                              
-                             public String updatedAt;
+                             @LastModifiedDate
+                             private LocalDateTime updatedAt;
                              
-                             public Integer userCreatedId;
+                             private Integer userCreatedId;
                              
-                             public Integer userUpdatedId;
+                             private Integer userUpdatedId;
                          }""";
     }
     
@@ -89,13 +102,13 @@ public class Templates {
                          
                              private int status;
                          
-                             public String createdAt;
+                             private String createdAt;
                              
-                             public String updatedAt;
+                             private String updatedAt;
                              
-                             public Integer userCreatedId;
+                             private Integer userCreatedId;
                              
-                             public Integer userUpdatedId;
+                             private Integer userUpdatedId;
                          
                              private int offset;
                                            
@@ -231,41 +244,41 @@ public class Templates {
                               @Service
                               public class classNameServiceImpl implements classNameService {
                                   @Autowired 
-                                  private classNameRepository objNameRepository;
+                                  private classNameRepository repository;
                               
                                   @Override
                                   public className save(className objName) {
-                                      return objNameRepository.save(objName);
+                                      return repository.save(objName);
                                   }
                               
                                   @Override
                                   public List<className> saveAll(List<className> objName){
-                                      return objNameRepository.saveAll(objName);
+                                      return repository.saveAll(objName);
                                   }
                               
                                   @Override
                                   public List<className> list(){
-                                      return (List<className>) objNameRepository.findAll();
+                                      return (List<className>) repository.findAll();
                                   }
                               
                                   @Override
                                   public void deleteById(Long id){
-                                      objNameRepository.deleteById(id);
+                                      repository.deleteById(id);
                                   }
                               
                                   @Override
                                   public boolean existsById(Long id) {
-                                      return objNameRepository.existsById(id);
+                                      return repository.existsById(id);
                                   }
                               
                                   @Override
                                   public className getById(Long id){
-                                      return objNameRepository.findById(id).get();
+                                      return repository.findById(id).get();
                                   }
                                   
                                   @Override
                                   public List<classNameDto> filteredList(Specification<className> specs, PageRequest pageRequest){
-                                      Page<className> objNamePage = objNameRepository.findAll(specs,
+                                      Page<className> objNamePage = repository.findAll(specs,
                                           pageRequest);
                                       List<className> objName = objNamePage.getContent();
                                       return (List<classNameDto>) 
@@ -274,12 +287,12 @@ public class Templates {
                                   
                                   @Override
                                   public long count(){
-                                      return objNameRepository.count();
+                                      return repository.count();
                                   }
                                   
                                   @Override
                                   public long countFilteredList(Specification<className> specs){
-                                      return objNameRepository.count(specs);
+                                      return repository.count(specs);
                                   }
                               }
                               """;
