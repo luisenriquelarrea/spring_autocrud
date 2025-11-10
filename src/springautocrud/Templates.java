@@ -307,6 +307,7 @@ public class Templates {
                              package com.packageName.artifactName.controller;
                              
                              import org.springframework.beans.factory.annotation.Autowired;
+                             import org.springframework.http.HttpStatus;
                              import org.springframework.http.ResponseEntity;
                              import org.springframework.data.domain.PageRequest;
                              import org.springframework.data.jpa.domain.Specification;
@@ -322,11 +323,15 @@ public class Templates {
                              import org.springframework.web.bind.annotation.ResponseBody;
                              
                              import com.packageName.artifactName.dto.classNameDto;
+                             import com.packageName.artifactName.errorhandling.BusinessException;
                              import com.packageName.artifactName.model.className;
                              import com.packageName.artifactName.repository.specifications.classNameSpecifications;
                              import com.packageName.artifactName.service.classNameService;
                              
+                             import jakarta.persistence.OptimisticLockException;
+                             
                              import java.util.List;
+                             import java.util.Map;
                              
                              @CrossOrigin(origins = "*")
                              @RestController // This means that this class is a Controller
