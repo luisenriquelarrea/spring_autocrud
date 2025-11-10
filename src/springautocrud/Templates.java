@@ -351,7 +351,7 @@ public class Templates {
                                  @PostMapping(path="/addAll")
                                  public ResponseEntity<Object> addAll(@RequestBody List<className> objNameList) {
                                      if (objNameList == null || objNameList.isEmpty())
-                                         return ResponseEntity.badRequest().body(Map.of("message", "Sin información a guardar."));
+                                         return ResponseEntity.badRequest().body(Map.of("message", "Sin informacion a guardar."));
                                      try {
                                          List<className> saved = objNameService.saveAll(objNameList);
                                          return ResponseEntity.ok(saved);
