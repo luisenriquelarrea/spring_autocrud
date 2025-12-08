@@ -60,6 +60,9 @@ public class SpringAutoCrud {
         template = templates.getDtoTemplate();
         createJavaFile(template, "Dto", keys);
         
+        template = templates.getMapperTemplate();
+        createJavaFile(template, "Mapper", keys);
+        
         template = templates.getSpecificationTemplate();
         createJavaFile(template, "Specifications", keys);
         
@@ -127,6 +130,8 @@ public class SpringAutoCrud {
             return basedir+"/model/";
         if(fileType.equalsIgnoreCase("dto"))
             return basedir+"/dto/";
+        if(fileType.equalsIgnoreCase("mapper"))
+            return basedir+"/mapper/";
         if(fileType.equalsIgnoreCase("specifications"))
             return basedir+"/repository/specifications/";
         if(fileType.equalsIgnoreCase("repository"))

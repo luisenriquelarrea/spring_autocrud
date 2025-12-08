@@ -11,6 +11,7 @@ package springautocrud;
 public class Templates {
     private String modeloTemplate;
     private String dtoTemplate;
+    private String mapperTemplate;
     private String specificationTemplate;
     private String repositoryTemplate;
     private String serviceTemplate;
@@ -20,6 +21,7 @@ public class Templates {
     public Templates(){
         setModeloTemplate();
         setDtoTemplate();
+        setMapperTemplate();
         setSpecificationTemplate();
         setRepositoryTemplate();
         setServiceTemplate();
@@ -86,6 +88,8 @@ public class Templates {
     private void setDtoTemplate(){
         dtoTemplate = """
                          package com.packageName.artifactName.dto;
+                      
+                         import java.time.LocalDateTime;
                          
                          import jakarta.persistence.Table;
                          
@@ -102,9 +106,9 @@ public class Templates {
                          
                              private int status;
                          
-                             private String createdAt;
+                             private LocalDateTime createdAt;
                              
-                             private String updatedAt;
+                             private LocalDateTime updatedAt;
                              
                              private Integer userCreatedId;
                              
@@ -118,6 +122,31 @@ public class Templates {
     
     public String getDtoTemplate(){
         return dtoTemplate;
+    }
+    
+    private void setMapperTemplate(){
+        mapperTemplate = """
+                         package com.packageName.artifactName.mapper;
+                         
+                         import org.mapstruct.BeanMapping;
+                         import org.mapstruct.Mapper;
+                         import org.mapstruct.MappingTarget;
+                         import org.mapstruct.NullValuePropertyMappingStrategy;
+                         
+                         import com.packageName.artifactName.model.className;
+                         import com.packageName.artifactName.dto.classNameDto;
+                         
+                         @Mapper(componentModel = "spring")
+                         public interface classNameMapper extends BaseMapper<className, classNameDto> {
+                             @Override
+                             @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
+                             void updateEntityFromDto(classNameDto dto, @MappingTarget className entity);
+                         }
+                         """;
+    }
+    
+    public String getMapperTemplate(){
+        return mapperTemplate;
     }
     
     private void setSpecificationTemplate(){
@@ -186,6 +215,8 @@ public class Templates {
                           import org.springframework.data.domain.PageRequest;
                           import org.springframework.data.jpa.domain.Specification;
                           
+                          import com.fasterxml.jackson.databind.JsonNode;
+                          
                           import com.packageName.artifactName.dto.classNameDto;
                           import com.packageName.artifactName.model.className;
                           
@@ -195,6 +226,9 @@ public class Templates {
                           
                               // Save a list of entities in batch
                               List<className> saveAll(List<className> objName);
+                          
+                              //Patch operation
+                              classNameDto patch(Long id, JsonNode patchNode);
                               
                               //Read operation
                               List<className> list();
@@ -235,16 +269,22 @@ public class Templates {
                               import org.springframework.stereotype.Service;
                               
                               import com.packageName.artifactName.dto.classNameDto;
+                              import com.packageName.artifactName.mapper.classNameMapper;
                               import com.packageName.artifactName.model.className;
                               import com.packageName.artifactName.repository.classNameRepository;
                               import com.packageName.artifactName.utils.ObjectMapperUtils;
                               
+                              import com.fasterxml.jackson.databind.JsonNode;
+                              
                               import java.util.List;
                               
                               @Service
-                              public class classNameServiceImpl implements classNameService {
+                              public class classNameServiceImpl extends BaseServiceImpl implements classNameService {
                                   @Autowired 
                                   private classNameRepository repository;
+                              
+                                  @Autowired
+                                  private classNameMapper mapper;
                               
                                   @Override
                                   public className save(className objName) {
@@ -254,6 +294,17 @@ public class Templates {
                                   @Override
                                   public List<className> saveAll(List<className> objName){
                                       return repository.saveAll(objName);
+                                  }
+                              
+                                  @Override
+                                  public classNameDto patch(Long id, JsonNode patchNode) {
+                                      className entity = repository.findById(id)
+                                          .orElseThrow();
+                                      classNameDto originalDto = mapper.toDto(entity);
+                                      classNameDto patchedDto = applyMergePatchNode(originalDto, patchNode, classNameDto.class);
+                                      mapper.updateEntityFromDto(patchedDto, entity);
+                                      repository.save(entity);
+                                      return mapper.toDto(entity);
                                   }
                               
                                   @Override
@@ -315,6 +366,7 @@ public class Templates {
                              import org.springframework.web.bind.annotation.DeleteMapping;
                              import org.springframework.web.bind.annotation.RestController;
                              import org.springframework.web.bind.annotation.GetMapping;
+                             import org.springframework.web.bind.annotation.PatchMapping;
                              import org.springframework.web.bind.annotation.PathVariable;
                              import org.springframework.web.bind.annotation.PostMapping;
                              import org.springframework.web.bind.annotation.PutMapping;
@@ -329,6 +381,8 @@ public class Templates {
                              import com.packageName.artifactName.service.classNameService;
                              
                              import jakarta.persistence.OptimisticLockException;
+                             
+                             import com.fasterxml.jackson.databind.JsonNode;
                              
                              import java.util.List;
                              import java.util.Map;
@@ -365,6 +419,13 @@ public class Templates {
                                          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                              .body(Map.of("message", "Error al guardar los registros: " + ex.getMessage()));
                                      }
+                                 }
+                             
+                                 @PatchMapping(value = "/{id}", consumes = "application/merge-patch+json")
+                                 public ResponseEntity<classNameDto> patch(@PathVariable Long id, 
+                                         @RequestBody JsonNode patchNode) {
+                                     classNameDto objNameDto = objNameService.patch(id, patchNode);
+                                     return ResponseEntity.ok(objNameDto);
                                  }
                              
                                  @PutMapping(path="/{id}")
