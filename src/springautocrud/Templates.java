@@ -442,13 +442,21 @@ public class Templates {
                                  }
                              
                                  @DeleteMapping(path="/{id}")
-                                 public ResponseEntity<String> deleteById(@PathVariable String id) {
-                                     Long objNameId = Long.parseLong(id);
-                                     if(objNameService.existsById(objNameId)){
-                                         objNameService.deleteById(objNameId);
-                                         return ResponseEntity.ok("Deleted");
+                                 public ResponseEntity<?> deleteById(@PathVariable String id) {
+                                     Long objNameId;
+                                     try {
+                                         objNameId = Long.parseLong(id);
+                                     } catch (NumberFormatException e) {
+                                         return ResponseEntity.badRequest().body(Map.of(
+                                             "message", "El ID proporcionado no es válido."
+                                         ));
                                      }
-                                     return ResponseEntity.ok("ID not found");
+                                     if (!objNameService.existsById(objNameId))
+                                         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                                             "message", "ID no encontrado."
+                                         ));
+                                     objNameService.deleteById(objNameId);
+                                     return ResponseEntity.ok("Deleted");
                                  }
                              
                                  @GetMapping(path="/{id}")
