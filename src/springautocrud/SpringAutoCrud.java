@@ -27,16 +27,14 @@ public class SpringAutoCrud {
     public static void main(String[] args) {
         SpringAutoCrud obj = new SpringAutoCrud();
         String className = "";
-        String tableName = "";
         String packageName = "";
         String artifactName = "";
-        if(args.length != 4){
-            System.out.println("Error args required [className, tableName, packageName, artifactName]");
+        if(args.length != 3){
+            System.out.println("Error args required [Entity, packageName, artifactName]");
             System.exit(0);
         }
         try {
             className = args[0];
-            tableName = args[1];
             packageName = args[2];
             artifactName = args[3];
         } catch(ArrayIndexOutOfBoundsException ex) {
@@ -45,6 +43,7 @@ public class SpringAutoCrud {
         }
         String objName = className.substring(0, 1).toLowerCase() 
                 + className.substring(1);
+        String tableName = camelToSnake(className);
         HashMap<String, String> keys = new HashMap<>();
         keys.put("packageName", packageName);
         keys.put("artifactName", artifactName);
@@ -88,6 +87,15 @@ public class SpringAutoCrud {
             template = template.replaceAll(key, value);
         }
         return template;
+    }
+    
+    public static String camelToSnake(String input) {
+        if (input == null || input.isEmpty())
+            return input;
+        return input
+            .replaceAll("([a-z])([A-Z])", "$1_$2")
+            .replaceAll("([A-Z])([A-Z][a-z])", "$1_$2")
+            .toLowerCase();
     }
     
     public static File createFile(String dir, String className, String fileType){
