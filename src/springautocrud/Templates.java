@@ -91,12 +91,9 @@ public class Templates {
                       
                          import java.time.LocalDateTime;
                          
-                         import jakarta.persistence.Table;
-                         
                          import lombok.Getter;
                          import lombok.Setter;
                          
-                         @Table(name = "tableName")
                          @Getter
                          @Setter
                          public class classNameDto {
@@ -448,7 +445,7 @@ public class Templates {
                                          objNameId = Long.parseLong(id);
                                      } catch (NumberFormatException e) {
                                          return ResponseEntity.badRequest().body(Map.of(
-                                             "message", "El ID proporcionado no es válido."
+                                             "message", "El ID proporcionado no es valido."
                                          ));
                                      }
                                      if (!objNameService.existsById(objNameId))
