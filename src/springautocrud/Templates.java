@@ -48,17 +48,11 @@ public class Templates {
                          import jakarta.persistence.Id;
                          
                          import lombok.Data;
-                         import lombok.Getter;
-                         import lombok.RequiredArgsConstructor;
-                         import lombok.Setter;
                          
                          @Entity
                          @Table(name = "tableName")
                          @EntityListeners(AuditingEntityListener.class)
                          @Data
-                         @RequiredArgsConstructor
-                         @Getter
-                         @Setter
                          public class className {
                              @Id
                              @GeneratedValue(strategy=GenerationType.IDENTITY)
